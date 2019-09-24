@@ -1,5 +1,5 @@
-// doc query and count initlalize
-var ballcount = document.querySelector(p);
+// doc query and count initialize
+var ballcount = document.querySelector('p');
 var count = 0
 // setup canvas
 
@@ -18,7 +18,7 @@ function random(min, max) {
 
 // define Shape constructor
 
-function Shape(x, y, velX, velY, color, size) {
+function Shape(x, y, velX, velY, exists) {
   this.x = x;
   this.y = y;
   this.velX = velX;
@@ -28,8 +28,8 @@ function Shape(x, y, velX, velY, color, size) {
 
 // define EvilCircle constructor
 
-function EvilCircle(x, y, velX, velY, exists) {
-  shape.call(this, x, y, 20, 20, exists)
+function EvilCircle(x, y, velX, velY, exists, color, size) {
+  Shape.call(this, x, y, 20, 20, exists)
   this.color = 'white'
   this.size = 10
 }
@@ -38,7 +38,7 @@ function EvilCircle(x, y, velX, velY, exists) {
 
 EvilCircle.prototype.draw = function () {
   ctx.beginPath();
-  ctx.lineWidth = 3
+  ctx.lineWidth = 3;
   ctx.strokeStyle = this.color;
   ctx.arc(this.x, this.y, this.size, 0, 2 * Math.PI);
   ctx.stroke();
@@ -96,7 +96,7 @@ EvilCircle.prototype.collisionDetect = function () {
 
         count--;
 
-        p.textContent = 'Ball Count: ' + count;
+        ballcount.textContent = 'Ball Count: ' + count;
       }
     }
   }
@@ -104,11 +104,13 @@ EvilCircle.prototype.collisionDetect = function () {
 
 // define Ball constructor
 
-function Ball(x, y, velX, velY, exists) {
+function Ball(x, y, velX, velY, exists, color, size) {
   Shape.call(this, x, y, velX, velY, exists)
   this.color = color;
   this.size = size;
 }
+Ball.prototype = Object.create(Shape.prototype);
+Ball.prototype.constructor = Ball;
 
 
 // define ball draw method
@@ -172,17 +174,18 @@ while (balls.length < 25) {
     random(0 + size, height - size),
     random(-7, 7),
     random(-7, 7),
+    true,
     'rgb(' + random(0, 255) + ',' + random(0, 255) + ',' + random(0, 255) + ')',
     size
   );
   balls.push(ball);
   count++;
-  p.textContent = 'Ball Count: ' + count;
+  ballcount.textContent = 'Ball Count: ' + count;
 }
 
 // define loop that keeps drawing the scene constantly
 
-var evil = new EvilCircle(random(0,width), random(0,height), true);
+var evil = new EvilCircle(random(0, width), random(0, height), true);
 evil.setControls();
 
 function loop() {
@@ -199,9 +202,9 @@ function loop() {
     }
   }
 
-    EvilCircle.draw()
-    EvilCircle.checkBounds()
-    EvilCircle.collisionDetect()
+  evil.draw();
+  evil.checkBounds();
+  evil.collisionDetect();
 
   requestAnimationFrame(loop);
 }
